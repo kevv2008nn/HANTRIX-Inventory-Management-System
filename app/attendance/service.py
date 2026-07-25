@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.attendance.models import Attendance
 from app.student_profile.models import StudentProfile
+from app.notifications.models import Notification
 
 
 def check_in(student_id, db: Session):
@@ -36,16 +37,27 @@ def check_in(student_id, db: Session):
     db.commit()
     db.refresh(attendance)
 
-    # Update Student Profile
     profile = (
         db.query(StudentProfile)
-        .filter(StudentProfile.student_id == student_id)
+        .filter(
+            StudentProfile.student_id == student_id
+        )
         .first()
     )
 
     if profile:
         profile.total_visits += 1
         db.commit()
+
+    notification = Notification(
+        title="Student Checked In",
+        message=f"Student {student_id} entered the lab.",
+        receiver="ADMIN",
+        type="ATTENDANCE"
+    )
+
+    db.add(notification)
+    db.commit()
 
     return attendance
 
@@ -72,6 +84,16 @@ def check_out(student_id, db: Session):
 
     db.commit()
     db.refresh(attendance)
+
+    notification = Notification(
+        title="Student Checked Out",
+        message=f"Student {student_id} left the lab.",
+        receiver="ADMIN",
+        type="ATTENDANCE"
+    )
+
+    db.add(notification)
+    db.commit()
 
     return attendance
 

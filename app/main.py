@@ -11,7 +11,13 @@ import app.attendance.router as attendance
 import app.lab_sessions.router as lab_session
 import app.borrow_return.router as borrow
 import app.student_profile.router as profile
-
+import app.faculty.router as faculty
+import app.notifications.router as notification
+import app.analytics.router as analytics
+import app.raspberry_pi.router as raspberry
+import app.websocket.router as websocket_router
+import app.face_ai.router as face_ai
+import app.students.router as students
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +39,13 @@ app.include_router(attendance.router)
 app.include_router(lab_session.router)
 app.include_router(borrow.router)
 app.include_router(profile.router)
+app.include_router(faculty.router)
+app.include_router(notification.router)
+app.include_router(analytics.router)
+app.include_router(raspberry.router)
+app.include_router(websocket_router.router)
+app.include_router(face_ai.router)
+app.include_router(students.router)
 
 
 @app.get("/")

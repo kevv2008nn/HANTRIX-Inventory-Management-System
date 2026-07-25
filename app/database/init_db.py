@@ -8,6 +8,8 @@ from app.attendance.models import Attendance
 from app.lab_sessions.models import LabSession
 from app.borrow_return.models import BorrowTransaction
 from app.student_profile.models import StudentProfile
+from app.faculty.models import Faculty
+from app.notifications.models import Notification
 
 
 def init_db():
