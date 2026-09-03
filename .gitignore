@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment / secrets
+.env
+.env.*
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Generated files
+*.log
+*.tmp
+
+# Test/generated images
+temp_frame.jpg
+
+# Local backups
+backend_backup/
