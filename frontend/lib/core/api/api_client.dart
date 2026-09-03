@@ -5,7 +5,7 @@ class ApiClient {
 
     BaseOptions(
 
-      baseUrl: "http://127.0.0.1:8000",
+      baseUrl: "http://192.168.77.104:8000",
 
       connectTimeout: const Duration(seconds: 10),
 

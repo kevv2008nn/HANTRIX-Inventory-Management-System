@@ -8,25 +8,52 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff0f172a),
-              Color(0xff111827),
-              Color(0xff1e293b),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xff020617),
+                  Color(0xff0f172a),
+                  Color(0xff1e293b),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
-        ),
 
-        child: const Center(
-          child: LoginCard(),
-        ),
+          Positioned(
+            top: -120,
+            left: -100,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                color: Colors.cyan.withOpacity(.18),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: -120,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(.12),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+
+          const Center(
+            child: LoginCard(),
+          ),
+        ],
       ),
     );
   }

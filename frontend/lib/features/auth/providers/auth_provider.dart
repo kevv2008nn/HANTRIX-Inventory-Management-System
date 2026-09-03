@@ -20,16 +20,28 @@ class AuthNotifier extends StateNotifier<bool> {
     String password,
   ) async {
     try {
+      print("================================");
+      print("LOGIN STARTED");
+      print("Email : $email");
+      print("Password : $password");
+      print("================================");
+
       state = true;
 
       final response = await repository.login(
         LoginRequest(
-          email: email,
-          password: password,
+          email: email.trim(),
+          password: password.trim(),
         ),
       );
 
-      final prefs = await SharedPreferences.getInstance();
+      print("================================");
+      print("LOGIN SUCCESS");
+      print(response.accessToken);
+      print("================================");
+
+      final prefs =
+          await SharedPreferences.getInstance();
 
       await prefs.setString(
         "token",
@@ -37,10 +49,18 @@ class AuthNotifier extends StateNotifier<bool> {
       );
 
       state = false;
+
       return null;
-    } catch (e) {
+    } catch (e, s) {
       state = false;
-      return "Invalid Email or Password";
+
+      print("================================");
+      print("LOGIN FAILED");
+      print(e);
+      print(s);
+      print("================================");
+
+      return e.toString();
     }
   }
 }

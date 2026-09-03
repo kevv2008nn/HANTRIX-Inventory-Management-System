@@ -10,27 +10,21 @@ class LoginCard extends ConsumerStatefulWidget {
   const LoginCard({super.key});
 
   @override
-  ConsumerState<LoginCard> createState() =>
-      _LoginCardState();
+  ConsumerState<LoginCard> createState() => _LoginCardState();
 }
 
-class _LoginCardState
-    extends ConsumerState<LoginCard> {
+class _LoginCardState extends ConsumerState<LoginCard> {
   final emailController = TextEditingController();
-
-  final passwordController =
-      TextEditingController();
+  final passwordController = TextEditingController();
 
   bool remember = false;
 
   @override
   Widget build(BuildContext context) {
-    final loading =
-        ref.watch(authProvider);
+    final loading = ref.watch(authProvider);
 
     return ClipRRect(
-      borderRadius:
-          BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(25),
       child: BackdropFilter(
         filter: ImageFilter.blur(
           sigmaX: 15,
@@ -38,22 +32,15 @@ class _LoginCardState
         ),
         child: Container(
           width: 420,
-          padding:
-              const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(30),
           decoration: BoxDecoration(
-            color:
-                Colors.white.withOpacity(.08),
-            borderRadius:
-                BorderRadius.circular(25),
-            border: Border.all(
-              color: Colors.white24,
-            ),
+            color: Colors.white.withOpacity(.08),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.white24),
           ),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
-
               const Icon(
                 Icons.memory,
                 size: 70,
@@ -67,8 +54,7 @@ class _LoginCardState
                 style: TextStyle(
                   fontSize: 32,
                   color: Colors.white,
-                  fontWeight:
-                      FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
@@ -84,10 +70,8 @@ class _LoginCardState
               const SizedBox(height: 30),
 
               TextField(
-                controller:
-                    emailController,
-                decoration:
-                    const InputDecoration(
+                controller: emailController,
+                decoration: const InputDecoration(
                   labelText: "Email",
                 ),
               ),
@@ -95,11 +79,9 @@ class _LoginCardState
               const SizedBox(height: 20),
 
               TextField(
-                controller:
-                    passwordController,
+                controller: passwordController,
                 obscureText: true,
-                decoration:
-                    const InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Password",
                 ),
               ),
@@ -108,20 +90,15 @@ class _LoginCardState
 
               Row(
                 children: [
-
                   Checkbox(
                     value: remember,
                     onChanged: (v) {
                       setState(() {
-                        remember = v!;
+                        remember = v ?? false;
                       });
                     },
                   ),
-
-                  const Text(
-                    "Remember Me",
-                  )
-
+                  const Text("Remember Me"),
                 ],
               ),
 
@@ -134,41 +111,50 @@ class _LoginCardState
                   onPressed: loading
                       ? null
                       : () async {
+                          print("================================");
+                          print("BUTTON PRESSED");
+                          print("Email : ${emailController.text}");
+                          print("Password : ${passwordController.text}");
+                          print("================================");
 
-                          final error =
-                              await ref
-                                  .read(
-                                      authProvider
-                                          .notifier)
-                                  .login(
-                                    emailController
-                                        .text,
-                                    passwordController
-                                        .text,
-                                  );
+                          final error = await ref
+                              .read(authProvider.notifier)
+                              .login(
+                                emailController.text,
+                                passwordController.text,
+                              );
 
-                          if (!mounted)
-                            return;
+                          print("Returned Error : $error");
 
-                          if (error ==
-                              null) {
-                            context.go(
-                                "/dashboard");
+                          if (!mounted) return;
+
+                          if (error == null) {
+                            print("GO TO DASHBOARD");
+                            context.go("/dashboard");
                           } else {
-                            ScaffoldMessenger.of(
-                                    context)
-                                .showSnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content:
-                                    Text(error),
+                                content: Text(error),
                               ),
                             );
                           }
                         },
                   child: loading
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text(
-                          "LOGIN"),
+                          "LOGIN",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],

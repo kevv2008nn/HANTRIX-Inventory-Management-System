@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.notifications.models import Notification
 
 from app.face_ai.register import register_face as register
-from app.face_ai.recognizer import recognize
+from app.face_ai.recognize import recognize_face as recognize
 
 from app.attendance.service import check_in
 from app.lab_sessions.service import start_session
@@ -34,11 +34,13 @@ def register_face(data, db: Session):
     }
 
 
-def recognize_face(data, db: Session):
+def recognize_student(data, db: Session):
 
-    student = recognize(data.image_path)
+    result = recognize(
+        data.image_path
+    )
 
-    if student is None:
+    if result is None:
 
         notification = Notification(
             title="Unknown Face",
@@ -52,15 +54,22 @@ def recognize_face(data, db: Session):
 
         return {
             "recognized": False,
-            "student_id": None
+            "student_id": None,
+            "confidence": 0
         }
+
+    student_id = result["student_id"]
+    confidence = result["confidence"]
 
     try:
 
-        attendance = check_in(student, db)
+        attendance = check_in(
+            student_id,
+            db
+        )
 
         start_session(
-            student,
+            student_id,
             attendance.attendance_id,
             db
         )
@@ -70,7 +79,7 @@ def recognize_face(data, db: Session):
 
     notification = Notification(
         title="Face Recognition",
-        message=f"{student} entered the lab.",
+        message=f"{student_id} entered the lab.",
         receiver="ADMIN",
         type="FACE_AI"
     )
@@ -80,5 +89,6 @@ def recognize_face(data, db: Session):
 
     return {
         "recognized": True,
-        "student_id": student
+        "student_id": student_id,
+        "confidence": confidence
     }

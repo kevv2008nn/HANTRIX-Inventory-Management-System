@@ -1,55 +1,79 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-from app.database.init_db import init_db
-
 import app.auth.auth_router as auth
-import app.routers.student as student
-import app.routers.inventory as inventory
-import app.dashboard.dashboard_router as dashboard
+import app.iot.iot_router as iot
+import app.students.student_router as students
+import app.recognition.router as recognition
 import app.attendance.router as attendance
-import app.lab_sessions.router as lab_session
-import app.borrow_return.router as borrow
-import app.student_profile.router as profile
-import app.faculty.router as faculty
-import app.notifications.router as notification
-import app.analytics.router as analytics
-import app.raspberry_pi.router as raspberry
-import app.websocket.router as websocket_router
-import app.face_ai.router as face_ai
-import app.students.router as students
+import app.lab_sessions.router as lab_sessions
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
+from app.database.database import Base, engine
+
+from app.recognition.model import RecognitionSetting
 
 
 app = FastAPI(
     title="SmartLab OS",
+    description="Smart Laboratory Management System",
     version="1.0.0",
-    lifespan=lifespan
 )
 
+
+# =========================================================
+# DATABASE
+# =========================================================
+
+Base.metadata.create_all(bind=engine)
+
+
+# =========================================================
+# AUTH
+# =========================================================
+
 app.include_router(auth.router)
-app.include_router(student.router)
-app.include_router(inventory.router)
-app.include_router(dashboard.router)
-app.include_router(attendance.router)
-app.include_router(lab_session.router)
-app.include_router(borrow.router)
-app.include_router(profile.router)
-app.include_router(faculty.router)
-app.include_router(notification.router)
-app.include_router(analytics.router)
-app.include_router(raspberry.router)
-app.include_router(websocket_router.router)
-app.include_router(face_ai.router)
+
+
+# =========================================================
+# IoT
+# =========================================================
+
+app.include_router(iot.router)
+
+
+# =========================================================
+# STUDENTS
+# =========================================================
+
 app.include_router(students.router)
 
+
+# =========================================================
+# RECOGNITION
+# =========================================================
+
+app.include_router(recognition.router)
+
+
+# =========================================================
+# ATTENDANCE
+# =========================================================
+
+app.include_router(attendance.router)
+
+
+# =========================================================
+# LAB SESSIONS
+# =========================================================
+
+app.include_router(lab_sessions.router)
+
+
+# =========================================================
+# ROOT
+# =========================================================
 
 @app.get("/")
 def root():
     return {
-        "message": "SmartLab OS Running 🚀"
+        "message": "SmartLab OS Backend Running"
     }

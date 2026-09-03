@@ -1,19 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/student_repository.dart';
-
 import '../models/student_model.dart';
 
-final studentProvider=
+final studentRepositoryProvider =
+    Provider<StudentRepository>((ref) {
+  return StudentRepository();
+});
 
-FutureProvider<List<StudentModel>>(
-
-(ref){
-
-return StudentRepository()
-
-.getStudents();
-
-}
-
-);
+final studentProvider =
+    FutureProvider<List<StudentModel>>((ref) async {
+  final repo = ref.read(studentRepositoryProvider);
+  return repo.getStudents();
+});

@@ -10,8 +10,9 @@ from app.face_ai.schemas import (
 
 from app.face_ai.service import (
     register_face,
-    recognize_face
+    recognize_student
 )
+
 
 router = APIRouter(
     prefix="/face",
@@ -24,7 +25,11 @@ def recognize(
     data: FaceRecognitionRequest,
     db: Session = Depends(get_db)
 ):
-    return recognize_face(data, db)
+
+    return recognize_student(
+        data,
+        db
+    )
 
 
 @router.post("/register")
@@ -32,4 +37,8 @@ def register(
     data: FaceRegistrationRequest,
     db: Session = Depends(get_db)
 ):
-    return register_face(data, db)
+
+    return register_face(
+        data,
+        db
+    )

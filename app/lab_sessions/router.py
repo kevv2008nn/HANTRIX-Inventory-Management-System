@@ -3,19 +3,36 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 
-from app.lab_sessions.schemas import StartSession
-from app.lab_sessions.schemas import EndSession
+from app.lab_sessions.schemas import (
+    StartSession,
+    EndSession,
+    EnterLab
+)
 
 from app.lab_sessions.service import (
     start_session,
+    enter_lab,
     end_session,
     active_sessions
 )
+
 
 router = APIRouter(
     prefix="/lab-session",
     tags=["Lab Session"]
 )
+
+
+@router.post("/enter")
+def session_enter(
+    data: EnterLab,
+    db: Session = Depends(get_db)
+):
+
+    return enter_lab(
+        data.student_id,
+        db
+    )
 
 
 @router.post("/start")

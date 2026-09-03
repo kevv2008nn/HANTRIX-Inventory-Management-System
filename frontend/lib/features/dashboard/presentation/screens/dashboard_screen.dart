@@ -1,144 +1,209 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../widgets/quick_action_card.dart';
-import '../widgets/live_camera_widget.dart';
-import '../widgets/notification_panel.dart';
+import '../../../iot/presentation/iot_screen.dart';
+import '../../../student/presentation/screens/student_list_screen.dart';
+import '../../../recognition/presentation/screens/recognition_settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff0f172a),
-
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text("SmartLab OS Dashboard"),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-
+  Widget buildCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Card(
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Icon(
+              icon,
+              size: 45,
+              color: color,
+            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
-            const Text(
-              "Quick Actions",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-            SizedBox(
-              height: 170,
+            Text(
+              title,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              child: ListView(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("SmartLab OS"),
+        centerTitle: true,
+      ),
 
-                scrollDirection: Axis.horizontal,
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+
+        child: Column(
+          children: [
+
+            // =========================
+            // CAMERA
+            // =========================
+
+            Container(
+              height: 250,
+              width: double.infinity,
+
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(15),
+              ),
+
+              child: const Center(
+                child: Text(
+                  "📷 Raspberry Pi Live Camera\nComing Soon",
+                  textAlign: TextAlign.center,
+
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // =========================
+            // DASHBOARD CARDS
+            // =========================
+
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
 
                 children: [
 
-                  QuickActionCard(
+                  // =========================
+                  // STUDENTS PRESENT
+                  // =========================
 
-                    icon: Icons.people,
+                  buildCard(
+                    "Students Present",
+                    "0",
+                    Icons.people,
+                    Colors.blue,
+                  ),
 
-                    title: "Students",
+                  // =========================
+                  // EQUIPMENT
+                  // =========================
 
-                    color: Colors.cyan,
+                  buildCard(
+                    "Equipment",
+                    "0",
+                    Icons.inventory,
+                    Colors.green,
+                  ),
 
+                  // =========================
+                  // BORROWED
+                  // =========================
+
+                  buildCard(
+                    "Borrowed",
+                    "0",
+                    Icons.assignment_return,
+                    Colors.orange,
+                  ),
+
+                  // =========================
+                  // FACE RECOGNITIONS
+                  // =========================
+
+                  buildCard(
+                    "Face Recognitions",
+                    "0",
+                    Icons.face,
+                    Colors.red,
+                  ),
+
+                  // =========================
+                  // STUDENTS
+                  // =========================
+
+                  GestureDetector(
                     onTap: () {
 
-                      context.go("/students");
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const StudentListScreen(),
+                        ),
+                      );
 
                     },
 
+                    child: buildCard(
+                      "Students",
+                      "View",
+                      Icons.school,
+                      Colors.indigo,
+                    ),
                   ),
 
-                  const SizedBox(width: 20),
+                  // =========================
+                  // RECOGNITION SETTINGS
+                  // =========================
 
-                  QuickActionCard(
-
-                    icon: Icons.inventory,
-
-                    title: "Inventory",
-
-                    color: Colors.orange,
-
+                  GestureDetector(
                     onTap: () {
 
-                      context.go("/inventory");
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const RecognitionSettingsScreen(),
+                        ),
+                      );
 
                     },
 
+                    child: buildCard(
+                      "Recognition",
+                      "Settings",
+                      Icons.security,
+                      Colors.purple,
+                    ),
                   ),
-
-                  const SizedBox(width: 20),
-
-                  QuickActionCard(
-
-                    icon: Icons.analytics,
-
-                    title: "Analytics",
-
-                    color: Colors.green,
-
-                    onTap: () {
-
-                      context.go("/analytics");
-
-                    },
-
-                  ),
-
-                  const SizedBox(width: 20),
-
-                  QuickActionCard(
-
-                    icon: Icons.camera_alt,
-
-                    title: "Camera",
-
-                    color: Colors.purple,
-
-                    onTap: () {
-
-                      context.go("/camera");
-
-                    },
-
-                  ),
-
                 ],
-
               ),
-
             ),
-
-            const SizedBox(height: 30),
-
-            const LiveCameraWidget(),
-
-            const SizedBox(height: 30),
-
-            const NotificationPanel(),
-
           ],
-
         ),
-
       ),
-
     );
   }
 }

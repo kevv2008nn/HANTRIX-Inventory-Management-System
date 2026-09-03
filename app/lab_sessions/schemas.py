@@ -11,6 +11,10 @@ class EndSession(BaseModel):
     student_id: UUID
 
 
+class EnterLab(BaseModel):
+    student_id: UUID
+
+
 class SessionResponse(BaseModel):
     session_id: UUID
     student_id: UUID
