@@ -6,7 +6,7 @@ import '../models/student_model.dart';
 class StudentService {
   Future<List<StudentModel>> getStudents() async {
     final Response response = await ApiClient.dio.get(
-      "/api/students/",
+      "/students/",
     );
 
     final List<dynamic> data = response.data;
@@ -22,7 +22,7 @@ class StudentService {
 
   Future<StudentModel> getStudent(String studentId) async {
     final Response response = await ApiClient.dio.get(
-      "/api/students/$studentId",
+      "/students/$studentId",
     );
 
     return StudentModel.fromJson(
