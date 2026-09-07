@@ -38,7 +38,7 @@ class _IoTScreenState extends State<IoTScreen> {
   Future<void> fetchIoTData() async {
     try {
       final response = await dio.get(
-        "http://192.168.77.104:8000/api/iot",
+        "http://192.168.76.43:8000/api/iot",
       );
 
       final List data = response.data;

@@ -8,7 +8,7 @@ class LiveMonitorService {
   Stream<Map<String, dynamic>> connect() {
     _channel = WebSocketChannel.connect(
       Uri.parse(
-        "ws://192.168.76.200:8000/ws",
+        "ws://192.168.76.43:8000/ws",
       ),
     );
 

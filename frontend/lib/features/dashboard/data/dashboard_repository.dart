@@ -1,4 +1,4 @@
-import '../../../core/network/api_client.dart';
+import '../../../core/api/api_client.dart';
 import '../models/dashboard_model.dart';
 
 class DashboardRepository {

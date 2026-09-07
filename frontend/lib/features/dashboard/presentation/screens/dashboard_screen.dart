@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../iot/presentation/iot_screen.dart';
 import '../../../student/presentation/screens/student_list_screen.dart';
 import '../../../recognition/presentation/screens/recognition_settings_screen.dart';
 

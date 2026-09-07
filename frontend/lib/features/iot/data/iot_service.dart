@@ -5,7 +5,7 @@ class IoTService {
 
   Future<List<dynamic>> getIoTData() async {
     final response = await dio.get(
-      'http://192.168.77.104:8000/api/iot',
+      'http://192.168.76.43:8000/api/iot',
     );
 
     return response.data;
