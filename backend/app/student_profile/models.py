@@ -17,7 +17,7 @@ class StudentProfile(Base):
     )
 
     student_id = Column(
-        UUID(as_uuid=True),
+        String,
         ForeignKey("students.student_id"),
         unique=True
     )
