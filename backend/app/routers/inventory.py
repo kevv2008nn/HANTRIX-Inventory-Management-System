@@ -1,72 +1,102 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status
+)
+
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.models.inventory import Inventory
+
 from app.schemas.inventory import (
     InventoryCreate,
-    InventoryResponse,
     InventoryUpdate,
+    InventoryResponse
 )
+
+from app.inventory.service import (
+    create_inventory,
+    get_all_inventory,
+    get_inventory,
+    update_inventory,
+    delete_inventory
+)
+
 
 router = APIRouter(
     prefix="/inventory",
-    tags=["Inventory"],
+    tags=["Inventory"]
 )
 
 
-@router.post("/", response_model=InventoryResponse)
-def create_inventory(
-    item: InventoryCreate,
-    db: Session = Depends(get_db),
+# ============================================================
+# CREATE
+# ============================================================
+
+@router.post(
+    "/",
+    response_model=InventoryResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def create_item(
+    data: InventoryCreate,
+    db: Session = Depends(get_db)
 ):
 
-    existing = db.query(Inventory).filter(
-        Inventory.qr_code == item.qr_code
-    ).first()
-
-    if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="QR Code already exists"
-        )
-
-    new_item = Inventory(
-        component_name=item.component_name,
-        category=item.category,
-        rack=item.rack,
-        shelf=item.shelf,
-        quantity=item.quantity,
-        minimum_quantity=item.minimum_quantity,
-        qr_code=item.qr_code,
-        rfid_tag=item.rfid_tag,
-        condition=item.condition,
-        status=item.status,
+    existing = get_inventory(
+        db,
+        data.component_id
     )
 
-    db.add(new_item)
-    db.commit()
-    db.refresh(new_item)
+    if existing:
 
-    return new_item
+        raise HTTPException(
+            status_code=409,
+            detail="Component ID already exists"
+        )
+
+    return create_inventory(
+        db,
+        data
+    )
 
 
-@router.get("/", response_model=list[InventoryResponse])
-def get_inventory(db: Session = Depends(get_db)):
-    return db.query(Inventory).all()
+# ============================================================
+# GET ALL
+# ============================================================
 
-
-@router.get("/{component_id}", response_model=InventoryResponse)
-def get_inventory_item(
-    component_id: str,
-    db: Session = Depends(get_db),
+@router.get(
+    "/",
+    response_model=list[InventoryResponse]
+)
+def list_inventory(
+    db: Session = Depends(get_db)
 ):
 
-    item = db.query(Inventory).filter(
-        Inventory.component_id == component_id
-    ).first()
+    return get_all_inventory(db)
+
+
+# ============================================================
+# GET ONE
+# ============================================================
+
+@router.get(
+    "/{component_id}",
+    response_model=InventoryResponse
+)
+def get_item(
+    component_id: str,
+    db: Session = Depends(get_db)
+):
+
+    item = get_inventory(
+        db,
+        component_id
+    )
 
     if not item:
+
         raise HTTPException(
             status_code=404,
             detail="Component not found"
@@ -75,53 +105,61 @@ def get_inventory_item(
     return item
 
 
-@router.put("/{component_id}", response_model=InventoryResponse)
-def update_inventory(
+# ============================================================
+# UPDATE
+# ============================================================
+
+@router.put(
+    "/{component_id}",
+    response_model=InventoryResponse
+)
+def update_item(
     component_id: str,
-    updated: InventoryUpdate,
-    db: Session = Depends(get_db),
+    data: InventoryUpdate,
+    db: Session = Depends(get_db)
 ):
 
-    item = db.query(Inventory).filter(
-        Inventory.component_id == component_id
-    ).first()
+    item = update_inventory(
+        db,
+        component_id,
+        data
+    )
 
     if not item:
+
         raise HTTPException(
             status_code=404,
             detail="Component not found"
         )
-
-    data = updated.model_dump(exclude_unset=True)
-
-    for key, value in data.items():
-        setattr(item, key, value)
-
-    db.commit()
-    db.refresh(item)
 
     return item
 
 
-@router.delete("/{component_id}")
-def delete_inventory(
+# ============================================================
+# DELETE
+# ============================================================
+
+@router.delete(
+    "/{component_id}"
+)
+def delete_item(
     component_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
 
-    item = db.query(Inventory).filter(
-        Inventory.component_id == component_id
-    ).first()
+    deleted = delete_inventory(
+        db,
+        component_id
+    )
 
-    if not item:
+    if not deleted:
+
         raise HTTPException(
             status_code=404,
             detail="Component not found"
         )
-
-    db.delete(item)
-    db.commit()
 
     return {
-        "message": "Component Deleted Successfully"
+        "message": "Component deleted successfully",
+        "component_id": component_id
     }

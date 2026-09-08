@@ -1,71 +1,155 @@
 import uuid
 
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from app.database.base import Base
+from app.database.database import Base
 
 
 class Inventory(Base):
-
     __tablename__ = "inventory"
 
-    component_id = Column(
+    # --------------------------------------------------------
+    # PRIMARY KEY
+    # --------------------------------------------------------
+
+    id = Column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid.uuid4
+        default=uuid.uuid4,
+    )
+
+    # --------------------------------------------------------
+    # COMPONENT ID
+    # Example: ESP32-001
+    # --------------------------------------------------------
+
+    component_id = Column(
+        String(100),
+        unique=True,
+        nullable=False,
+        index=True,
     )
 
     component_name = Column(
-        String(100),
-        nullable=False
+        String(255),
+        nullable=False,
     )
+
+    # --------------------------------------------------------
+    # COMPONENT INFORMATION
+    # --------------------------------------------------------
 
     category = Column(
-        String(50),
-        nullable=False
+        String(100),
+        nullable=True,
     )
 
+    description = Column(
+        Text,
+        nullable=True,
+    )
+
+    # --------------------------------------------------------
+    # LOCATION
+    # --------------------------------------------------------
+
     rack = Column(
-        String(20)
+        String(100),
+        nullable=True,
     )
 
     shelf = Column(
-        String(20)
+        String(100),
+        nullable=True,
     )
+
+    location_code = Column(
+        String(150),
+        nullable=True,
+    )
+
+    # --------------------------------------------------------
+    # STOCK
+    # --------------------------------------------------------
 
     quantity = Column(
         Integer,
-        default=0
+        nullable=False,
+        default=0,
     )
 
     minimum_quantity = Column(
         Integer,
-        default=1
+        nullable=False,
+        default=0,
     )
 
+    # --------------------------------------------------------
+    # IDENTIFICATION
+    # --------------------------------------------------------
+
     qr_code = Column(
-        String(100),
-        unique=True
+        String(255),
+        unique=True,
+        nullable=True,
     )
 
     rfid_tag = Column(
-        String(100),
-        unique=True
+        String(255),
+        unique=True,
+        nullable=True,
     )
+
+    # --------------------------------------------------------
+    # STATE
+    # --------------------------------------------------------
 
     condition = Column(
         String(50),
-        default="Excellent"
+        nullable=True,
+        default="GOOD",
     )
 
     status = Column(
-        String(30),
-        default="Available"
+        String(50),
+        nullable=True,
+        default="AVAILABLE",
     )
+
+    # --------------------------------------------------------
+    # AI
+    # --------------------------------------------------------
+
+    image_path = Column(
+        Text,
+        nullable=True,
+    )
+
+    detection_label = Column(
+        String(150),
+        nullable=True,
+    )
+
+    # --------------------------------------------------------
+    # TIMESTAMPS
+    # --------------------------------------------------------
 
     created_at = Column(
         DateTime(timezone=True),
-        server_default=func.now()
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
     )
