@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+import '../../../core/api/api_client.dart';
+
 class IoTScreen extends StatefulWidget {
   const IoTScreen({super.key});
 
@@ -10,7 +12,7 @@ class IoTScreen extends StatefulWidget {
 }
 
 class _IoTScreenState extends State<IoTScreen> {
-  final Dio dio = Dio();
+  final Dio dio = ApiClient.dio;
 
   Timer? timer;
 
@@ -38,7 +40,7 @@ class _IoTScreenState extends State<IoTScreen> {
   Future<void> fetchIoTData() async {
     try {
       final response = await dio.get(
-        "http://192.168.76.43:8000/api/iot",
+        "/api/iot",
       );
 
       final List data = response.data;

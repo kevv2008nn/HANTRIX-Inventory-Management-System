@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../core/constants/api_constants.dart';
+
 class LiveMonitorService {
   WebSocketChannel? _channel;
 
   Stream<Map<String, dynamic>> connect() {
     _channel = WebSocketChannel.connect(
       Uri.parse(
-        "ws://192.168.76.43:8000/ws",
+        "${ApiConstants.webSocketUrl}/ws",
       ),
     );
 

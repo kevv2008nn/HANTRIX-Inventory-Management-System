@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 
+import '../constants/api_constants.dart';
+
 class ApiClient {
   static final Dio dio = Dio(
 
     BaseOptions(
 
-      baseUrl: "http://192.168.76.43:8000",
+      baseUrl: ApiConstants.baseUrl,
 
       connectTimeout: const Duration(seconds: 10),
 
