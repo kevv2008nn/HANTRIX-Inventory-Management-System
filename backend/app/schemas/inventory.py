@@ -1,8 +1,13 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+
+# ============================================================
+# INVENTORY BASE
+# ============================================================
 
 class InventoryBase(BaseModel):
 
@@ -29,9 +34,17 @@ class InventoryBase(BaseModel):
     detection_label: Optional[str] = None
 
 
+# ============================================================
+# CREATE
+# ============================================================
+
 class InventoryCreate(InventoryBase):
     pass
 
+
+# ============================================================
+# UPDATE
+# ============================================================
 
 class InventoryUpdate(BaseModel):
 
@@ -57,10 +70,17 @@ class InventoryUpdate(BaseModel):
     detection_label: Optional[str] = None
 
 
+# ============================================================
+# RESPONSE
+# ============================================================
+
 class InventoryResponse(InventoryBase):
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
-    id: str
+    id: UUID
+
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

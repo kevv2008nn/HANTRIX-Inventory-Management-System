@@ -5,14 +5,31 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
+# ============================================================
+# CREATE ALERT
+# ============================================================
+
 class AlertCreate(BaseModel):
-    alert_type: str = Field(..., min_length=1, max_length=100)
-    title: str = Field(..., min_length=1, max_length=255)
-    message: str = Field(..., min_length=1)
+    alert_type: str = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+    )
+
+    title: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+    )
+
+    message: str = Field(
+        ...,
+        min_length=1,
+    )
 
     severity: str = Field(
         default="INFO",
-        max_length=30
+        max_length=30,
     )
 
     student_id: Optional[str] = None
@@ -23,10 +40,18 @@ class AlertCreate(BaseModel):
     metadata: Optional[dict[str, Any]] = None
 
 
+# ============================================================
+# ALERT RESPONSE
+# ============================================================
+
 class AlertResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+    )
 
     alert_id: UUID
+
     alert_type: str
     title: str
     message: str
@@ -39,14 +64,25 @@ class AlertResponse(BaseModel):
 
     status: str
 
-    metadata: Optional[dict[str, Any]] = None
+    # IMPORTANT:
+    # SQLAlchemy model attribute = event_metadata
+    # API field = metadata
+    metadata: Optional[dict[str, Any]] = Field(
+        default=None,
+        validation_alias="event_metadata",
+        serialization_alias="metadata",
+    )
 
     created_at: Optional[datetime] = None
     resolved_at: Optional[datetime] = None
 
 
+# ============================================================
+# ALERT RESOLVE
+# ============================================================
+
 class AlertResolve(BaseModel):
     status: str = Field(
         default="RESOLVED",
-        max_length=30
+        max_length=30,
     )

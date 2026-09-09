@@ -5,6 +5,10 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
+# =========================================================
+# TRANSACTION CREATE
+# =========================================================
+
 class TransactionCreate(BaseModel):
 
     student_id: str
@@ -19,6 +23,10 @@ class TransactionCreate(BaseModel):
     )
 
 
+# =========================================================
+# TAKE REQUEST
+# =========================================================
+
 class TakeRequest(BaseModel):
 
     student_id: str
@@ -30,6 +38,10 @@ class TakeRequest(BaseModel):
         gt=0,
     )
 
+
+# =========================================================
+# RETURN REQUEST
+# =========================================================
 
 class ReturnRequest(BaseModel):
 
@@ -43,9 +55,16 @@ class ReturnRequest(BaseModel):
     )
 
 
+# =========================================================
+# CAMERA-2 VERIFICATION REQUEST
+# =========================================================
+
 class VerificationRequest(BaseModel):
 
-    detected_label: str
+    detected_component: str = Field(
+        ...,
+        min_length=1,
+    )
 
     confidence: float = Field(
         ge=0,
@@ -54,6 +73,10 @@ class VerificationRequest(BaseModel):
 
     camera_id: Optional[str] = None
 
+
+# =========================================================
+# TRANSACTION RESPONSE
+# =========================================================
 
 class TransactionResponse(BaseModel):
 
