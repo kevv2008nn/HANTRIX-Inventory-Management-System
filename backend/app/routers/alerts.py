@@ -21,6 +21,7 @@ from app.alerts.service import (
     acknowledge_alert,
     create_alert,
     create_mismatch_alert,
+    create_system_warning_if_new,
     create_unknown_person_alert,
     get_alert,
     get_all_alerts,
@@ -77,7 +78,7 @@ def create_alert_endpoint(
 )
 def list_alerts(
     status: Optional[str] = Query(
-        default=None
+        default=None,
     ),
     limit: int = Query(
         default=100,
@@ -104,7 +105,9 @@ def list_alerts(
 def list_open_alerts(
     db: Session = Depends(get_db),
 ):
-    return get_open_alerts(db)
+    return get_open_alerts(
+        db=db,
+    )
 
 
 # ============================================================
@@ -118,11 +121,13 @@ def list_open_alerts(
 def scan_low_stock_endpoint(
     db: Session = Depends(get_db),
 ):
-    return scan_low_stock(db)
+    return scan_low_stock(
+        db=db,
+    )
 
 
 # ============================================================
-# SCAN OVERDUE TRANSACTIONS
+# SCAN OVERDUE
 # ============================================================
 
 @router.post(
@@ -139,6 +144,32 @@ def scan_overdue_endpoint(
     return scan_overdue_transactions(
         db=db,
         overdue_hours=overdue_hours,
+    )
+
+
+# ============================================================
+# TEST SYSTEM WARNING
+# ============================================================
+
+@router.post(
+    "/test/system-warning",
+    response_model=AlertResponse,
+)
+def test_system_warning(
+    db: Session = Depends(get_db),
+):
+    return create_system_warning_if_new(
+        db=db,
+        title="AI Engine Warning",
+        message=(
+            "The AI processing engine reported "
+            "a system warning."
+        ),
+        severity="WARNING",
+        metadata={
+            "source": "AI_ENGINE",
+            "test": True,
+        },
     )
 
 
@@ -221,7 +252,10 @@ def resolve_alert_endpoint(
 
 
 # ============================================================
-# TEST MISMATCH ALERT
+# TEST MISMATCH
+#
+# Uses STU001 because alerts.student_id has a foreign-key
+# relationship with students.student_id.
 # ============================================================
 
 @router.post(
@@ -234,7 +268,7 @@ def test_mismatch_alert(
     return create_mismatch_alert(
         db=db,
         component_id="ESP32-001",
-        student_id="TEST-STUDENT",
+        student_id="STU001",
         transaction_id=None,
         camera_id="camera_2",
         expected_component="ESP32",
@@ -244,7 +278,10 @@ def test_mismatch_alert(
 
 
 # ============================================================
-# TEST UNKNOWN PERSON ALERT
+# TEST UNKNOWN PERSON
+#
+# student_id intentionally remains NULL because an unknown
+# person has not been authenticated.
 # ============================================================
 
 @router.post(

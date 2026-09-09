@@ -1,11 +1,6 @@
 from uuid import UUID
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-)
-
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
@@ -32,9 +27,9 @@ router = APIRouter(
 )
 
 
-# ============================================================
+# =========================================================
 # TAKE
-# ============================================================
+# =========================================================
 
 @router.post(
     "/take",
@@ -45,26 +40,17 @@ def take_component(
     db: Session = Depends(get_db),
 ):
 
-    try:
-
-        return create_take_transaction(
-            db=db,
-            student_id=data.student_id,
-            component_id=data.component_id,
-            quantity=data.quantity,
-        )
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=400,
-            detail=str(e),
-        )
+    return create_take_transaction(
+        db=db,
+        student_id=data.student_id,
+        component_id=data.component_id,
+        quantity=data.quantity,
+    )
 
 
-# ============================================================
+# =========================================================
 # RETURN
-# ============================================================
+# =========================================================
 
 @router.post(
     "/return",
@@ -75,115 +61,93 @@ def return_component(
     db: Session = Depends(get_db),
 ):
 
-    try:
-
-        return create_return_transaction(
-            db=db,
-            student_id=data.student_id,
-            component_id=data.component_id,
-            quantity=data.quantity,
-        )
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=400,
-            detail=str(e),
-        )
+    return create_return_transaction(
+        db=db,
+        student_id=data.student_id,
+        component_id=data.component_id,
+        quantity=data.quantity,
+    )
 
 
-# ============================================================
-# GET
-# ============================================================
+# =========================================================
+# GET TRANSACTION
+# =========================================================
 
 @router.get(
     "/{transaction_id}",
     response_model=TransactionResponse,
 )
-def get_transaction_by_id(
+def get_transaction_endpoint(
     transaction_id: UUID,
     db: Session = Depends(get_db),
 ):
 
-    transaction = get_transaction(
-        db,
-        transaction_id,
+    return get_transaction(
+        db=db,
+        transaction_id=transaction_id,
     )
 
-    if not transaction:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Transaction not found",
-        )
-
-    return transaction
-
-
-# ============================================================
-# VERIFY
-# ============================================================
+# =========================================================
+# CAMERA-2 VERIFY
+# =========================================================
 
 @router.post(
     "/{transaction_id}/verify",
     response_model=TransactionResponse,
 )
-def verify(
+def verify_transaction_endpoint(
     transaction_id: UUID,
     data: VerificationRequest,
     db: Session = Depends(get_db),
 ):
 
-    try:
+    # -----------------------------------------------------
+    # CAMERA-2 ONLY
+    # -----------------------------------------------------
 
-        return verify_transaction(
-            db=db,
-            transaction_id=transaction_id,
-            detected_label=data.detected_label,
-            confidence=data.confidence,
-            camera_id=data.camera_id,
-        )
+    camera_id = (
+        data.camera_id
+        or "camera_2"
+    )
 
-    except ValueError as e:
+    if camera_id.lower() != "camera_2":
 
         raise HTTPException(
             status_code=400,
-            detail=str(e),
+            detail=(
+                "Transaction verification "
+                "must be performed by camera_2."
+            ),
         )
 
+    # -----------------------------------------------------
+    # VERIFY TRANSACTION
+    # -----------------------------------------------------
 
-# ============================================================
+    return verify_transaction(
+        db=db,
+        transaction_id=transaction_id,
+        detected_component=data.detected_component,
+        camera_id=camera_id,
+        confidence=data.confidence,
+    )
+
+
+# =========================================================
 # CANCEL
-# ============================================================
+# =========================================================
 
 @router.post(
     "/{transaction_id}/cancel",
     response_model=TransactionResponse,
 )
-def cancel(
+def cancel_transaction_endpoint(
     transaction_id: UUID,
     db: Session = Depends(get_db),
 ):
 
-    try:
-
-        transaction = cancel_transaction(
-            db,
-            transaction_id,
-        )
-
-        if not transaction:
-
-            raise HTTPException(
-                status_code=404,
-                detail="Transaction not found",
-            )
-
-        return transaction
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=400,
-            detail=str(e),
-        )
+    return cancel_transaction(
+        db=db,
+        transaction_id=transaction_id,
+    )
