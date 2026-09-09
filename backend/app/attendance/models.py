@@ -4,7 +4,7 @@ from sqlalchemy import Column, Date, DateTime, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from app.database.base import Base
+from app.database.database import Base
 
 
 class Attendance(Base):
@@ -40,7 +40,8 @@ class Attendance(Base):
 
     status = Column(
         String(20),
-        default="IN"
+        default="IN",
+        nullable=False
     )
 
     created_at = Column(

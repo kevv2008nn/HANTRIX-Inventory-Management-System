@@ -1,7 +1,7 @@
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date
 from uuid import UUID
-from pydantic import BaseModel
+
+from pydantic import BaseModel, ConfigDict
 
 
 class AttendanceEntry(BaseModel):
@@ -14,7 +14,17 @@ class AttendanceExit(BaseModel):
     student_id: str
 
 
+class AttendanceAction(BaseModel):
+
+    student_id: str
+
+    action: str
+    # ENTRY or EXIT
+
+
 class AttendanceResponse(BaseModel):
+
+    model_config = ConfigDict(from_attributes=True)
 
     attendance_id: UUID
 
@@ -27,7 +37,3 @@ class AttendanceResponse(BaseModel):
     exit_time: datetime | None
 
     status: str
-
-    class Config:
-
-        from_attributes = True

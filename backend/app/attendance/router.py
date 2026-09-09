@@ -1,25 +1,34 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 
-from app.attendance.schemas import AttendanceEntry
-from app.attendance.schemas import AttendanceExit
+from app.attendance.schemas import (
+    AttendanceEntry,
+    AttendanceExit,
+    AttendanceAction,
+)
 
 from app.attendance.service import (
     check_in,
     check_out,
+    process_attendance_action,
     attendance_history,
-    students_inside
+    students_inside,
+    current_attendance,
 )
+
 
 router = APIRouter(
     prefix="/attendance",
     tags=["Attendance"]
 )
 
+
+# ============================================================
+# ENTRY
+# ============================================================
 
 @router.post("/checkin")
 def student_checkin(
@@ -28,10 +37,14 @@ def student_checkin(
 ):
 
     return check_in(
-        data.student_id,
-        db
+        student_id=data.student_id,
+        db=db
     )
 
+
+# ============================================================
+# EXIT
+# ============================================================
 
 @router.post("/checkout")
 def student_checkout(
@@ -40,10 +53,31 @@ def student_checkout(
 ):
 
     return check_out(
-        data.student_id,
-        db
+        student_id=data.student_id,
+        db=db
     )
 
+
+# ============================================================
+# EXPLICIT ENTRY / EXIT ACTION
+# ============================================================
+
+@router.post("/action")
+def attendance_action(
+    data: AttendanceAction,
+    db: Session = Depends(get_db)
+):
+
+    return process_attendance_action(
+        student_id=data.student_id,
+        action=data.action,
+        db=db
+    )
+
+
+# ============================================================
+# HISTORY
+# ============================================================
 
 @router.get("/history/{student_id}")
 def history(
@@ -52,14 +86,48 @@ def history(
 ):
 
     return attendance_history(
-        student_id,
-        db
+        student_id=student_id,
+        db=db
     )
 
+
+# ============================================================
+# STUDENTS INSIDE
+# ============================================================
 
 @router.get("/inside")
 def inside(
     db: Session = Depends(get_db)
 ):
 
-    return students_inside(db)
+    return students_inside(
+        db=db
+    )
+
+
+# ============================================================
+# CURRENT ATTENDANCE
+# ============================================================
+
+@router.get("/current/{student_id}")
+def current(
+    student_id: str,
+    db: Session = Depends(get_db)
+):
+
+    attendance = current_attendance(
+        student_id=student_id,
+        db=db
+    )
+
+    if attendance is None:
+
+        return {
+            "active": False,
+            "attendance": None
+        }
+
+    return {
+        "active": True,
+        "attendance": attendance
+    }
