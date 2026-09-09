@@ -4,7 +4,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from app.database.base import Base
+from app.database.database import Base
 
 
 class LabSession(Base):

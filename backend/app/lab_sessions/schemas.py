@@ -1,26 +1,37 @@
+from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel
+
+from pydantic import BaseModel, ConfigDict
 
 
-class StartSession(BaseModel):
+class LabSessionStart(BaseModel):
+
     student_id: str
+
     attendance_id: UUID
 
 
-class EndSession(BaseModel):
+class LabSessionEnd(BaseModel):
+
     student_id: str
 
 
-class EnterLab(BaseModel):
-    student_id: str
+class LabSessionResponse(BaseModel):
 
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
-class SessionResponse(BaseModel):
     session_id: UUID
-    student_id: str
-    attendance_id: UUID
-    duration: str
-    status: str
 
-    class Config:
-        from_attributes = True
+    student_id: str
+
+    attendance_id: UUID
+
+    start_time: datetime
+
+    end_time: datetime | None
+
+    duration: str | None
+
+    status: str
