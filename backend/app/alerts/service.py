@@ -9,7 +9,7 @@ from app.models.inventory import Inventory
 
 
 # ============================================================
-# CREATE GENERIC ALERT
+# GENERIC ALERT CREATION
 # ============================================================
 
 def create_alert(
@@ -199,7 +199,7 @@ def create_low_stock_alert(
 
 
 # ============================================================
-# CHECK EXISTING LOW STOCK ALERT
+# LOW STOCK DUPLICATE CHECK
 # ============================================================
 
 def low_stock_alert_exists(
@@ -259,7 +259,7 @@ def scan_low_stock(
 
 
 # ============================================================
-# COMPONENT MISMATCH ALERT
+# MISMATCH ALERT
 # ============================================================
 
 def create_mismatch_alert(
@@ -358,7 +358,7 @@ def create_overdue_alert(
 
 
 # ============================================================
-# CHECK EXISTING OVERDUE ALERT
+# OVERDUE DUPLICATE CHECK
 # ============================================================
 
 def overdue_alert_exists(
@@ -438,3 +438,83 @@ def scan_overdue_transactions(
         created_alerts.append(alert)
 
     return created_alerts
+
+
+# ============================================================
+# SYSTEM WARNING ALERT
+# ============================================================
+
+def create_system_warning_alert(
+    db: Session,
+    title: str,
+    message: str,
+    severity: str = "WARNING",
+    camera_id: Optional[str] = None,
+    metadata: Optional[dict[str, Any]] = None,
+):
+    return create_alert(
+        db=db,
+        alert_type="SYSTEM_WARNING",
+        title=title,
+        message=message,
+        severity=severity,
+        camera_id=camera_id,
+        metadata=metadata,
+    )
+
+
+# ============================================================
+# SYSTEM WARNING DUPLICATE CHECK
+# ============================================================
+
+def system_warning_exists(
+    db: Session,
+    title: str,
+    camera_id: Optional[str] = None,
+):
+    query = (
+        db.query(Alert)
+        .filter(
+            Alert.alert_type == "SYSTEM_WARNING",
+            Alert.title == title,
+            Alert.status == "OPEN",
+        )
+    )
+
+    if camera_id:
+        query = query.filter(
+            Alert.camera_id == camera_id
+        )
+
+    return query.first()
+
+
+# ============================================================
+# CREATE SYSTEM WARNING IF NOT ALREADY OPEN
+# ============================================================
+
+def create_system_warning_if_new(
+    db: Session,
+    title: str,
+    message: str,
+    severity: str = "WARNING",
+    camera_id: Optional[str] = None,
+    metadata: Optional[dict[str, Any]] = None,
+):
+    existing_alert = system_warning_exists(
+        db=db,
+        title=title,
+        camera_id=camera_id,
+    )
+
+    if existing_alert:
+        return existing_alert
+
+    return create_system_warning_alert(
+        db=db,
+        title=title,
+        message=message,
+        severity=severity,
+        camera_id=camera_id,
+        metadata=metadata,
+    )
